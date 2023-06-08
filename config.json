@@ -1,0 +1,5 @@
+{
+    "Environment": "Development",
+    "Port": 3030,
+    "WorkspacesPath": "/workspaces"
+}

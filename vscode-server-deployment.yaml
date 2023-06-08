@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vscode-server
+spec:
+  containers:
+    - name: vscode-server
+      image: ghcr.io/acadnet-dev/vscode-server:875286eacde93686f76d16abb009937cf36b9115
+      imagePullPolicy: "Always"
+      ports:
+        - containerPort: 3000
+      resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+  imagePullSecrets:
+    - name: ghcr-login-secret
