@@ -100,20 +100,17 @@ async def create_workspace(id: str, problem_name: str, files: list[UploadFile]):
 # returns the endpoint for workspace if it exists
 @app.get("/workspace/get/")
 async def get_workspace(id: str):
-    try:
-        # create new workspace
-        workspace = Workspace(id)
+    # create new workspace
+    workspace = Workspace(id)
 
-        # get pod endpoint
-        endpoint = workspace.get_pod_endpoint()
+    # get pod endpoint
+    endpoint = workspace.get_pod_endpoint()
 
-        # if pod does not exist, return error
-        if endpoint == None:
-            raise HTTPException(status_code=404, detail="Workspace not found")
+    # if pod does not exist, return error
+    if endpoint == None:
+        raise HTTPException(status_code=404, detail="Workspace not found")
 
-        return {"endpoint": endpoint}
-    except Exception as e:
-        return {"error": str(e)}
+    return {"endpoint": endpoint}
 
 def run():
     uvicorn.run(app, host="0.0.0.0", port=app_config.port)
