@@ -119,6 +119,8 @@ def run():
     uvicorn.run(app, host="0.0.0.0", port=app_config.port)
 
 if __name__ == "__main__":
-    # config.load_kube_config('/home/dimi/.kube/config', context='do-fra1-acadnet-dev-k8s')
-    config.load_incluster_config()
+    if app_config.development:
+        config.load_kube_config('/home/dimi/.kube/config', context='do-fra1-acadnet-dev-k8s')
+    else:
+        config.load_incluster_config()
     run()
