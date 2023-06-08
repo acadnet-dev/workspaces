@@ -14,6 +14,8 @@ from kubernetes import client, config
 app_config = Config("config.json")
 app = FastAPI()
 
+
+
 class Workspace:
     def __init__(self, workspace_id):
         self.id = workspace_id
@@ -24,7 +26,6 @@ class Workspace:
             f.write(file.file.read())
 
     def create_pod(self):
-        config.load_incluster_config()
         v1 = client.CoreV1Api()
 
         with open(path.join(path.dirname(__file__), "vscode-server-deployment.yaml")) as f:
@@ -53,7 +54,6 @@ class Workspace:
         self.pod_name = pod_name
 
     def get_pod_endpoint(self):
-        config.load_incluster_config()
         v1 = client.CoreV1Api()
 
         # if pod does not exist, return None
@@ -67,15 +67,14 @@ class Workspace:
         except Exception as e:
             return None
 
-    def add_file(self, file: UploadFile):
-        config.load_incluster_config()
+    def add_file(self, file: UploadFile, problem_name: str):
         v1 = client.CoreV1Api()
 
-        upload_textfile_to_pod(v1, self.pod_name, file, "/home/workspace")    
+        upload_textfile_to_pod(v1, self.pod_name, file, "/home/workspace", problem_name)    
     
 # gets endpoint for workspace
 @app.post("/workspace/get/")
-async def create_workspace(id: str, files: list[UploadFile]):
+async def create_workspace(id: str, problem_name: str, files: list[UploadFile]):
     try:
         # create new workspace
         workspace = Workspace(id)
@@ -89,7 +88,7 @@ async def create_workspace(id: str, files: list[UploadFile]):
             workspace.create_pod()
             # add files to pod
             for file in files:
-                workspace.add_file(file)
+                workspace.add_file(file, problem_name)
             # get pod endpoint
             endpoint = workspace.get_pod_endpoint()
 
@@ -102,4 +101,5 @@ def run():
     uvicorn.run(app, host="0.0.0.0", port=app_config.port)
 
 if __name__ == "__main__":
+    config.load_kube_config('/home/dimi/.kube/config', context='do-fra1-acadnet-dev-k8s')
     run()

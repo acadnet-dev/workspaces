@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: vscode-server
-      image: ghcr.io/acadnet-dev/vscode-server:875286eacde93686f76d16abb009937cf36b9115
+      image: ghcr.io/acadnet-dev/vscode-server:latest
       imagePullPolicy: "Always"
       ports:
         - containerPort: 3000
