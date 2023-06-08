@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 import uvicorn
 import time
 from uuid import uuid4
@@ -72,8 +72,8 @@ class Workspace:
 
         upload_textfile_to_pod(v1, self.pod_name, file, "/home/workspace", problem_name)    
     
-# gets endpoint for workspace
-@app.post("/workspace/get/")
+# creates and then returns the endpoint for workspace
+@app.post("/workspace/create/")
 async def create_workspace(id: str, problem_name: str, files: list[UploadFile]):
     try:
         # create new workspace
@@ -97,9 +97,28 @@ async def create_workspace(id: str, problem_name: str, files: list[UploadFile]):
         raise e
         return {"error": str(e)}
 
+# returns the endpoint for workspace if it exists
+@app.post("/workspace/get/")
+async def get_workspace(id: str):
+    try:
+        # create new workspace
+        workspace = Workspace(id)
+
+        # get pod endpoint
+        endpoint = workspace.get_pod_endpoint()
+
+        # if pod does not exist, return error
+        if endpoint == None:
+            raise HTTPException(status_code=404, detail="Workspace not found")
+
+        return {"endpoint": endpoint}
+    except Exception as e:
+        return {"error": str(e)}
+
 def run():
     uvicorn.run(app, host="0.0.0.0", port=app_config.port)
 
 if __name__ == "__main__":
-    config.load_kube_config('/home/dimi/.kube/config', context='do-fra1-acadnet-dev-k8s')
+    # config.load_kube_config('/home/dimi/.kube/config', context='do-fra1-acadnet-dev-k8s')
+    config.load_incluster_config()
     run()
