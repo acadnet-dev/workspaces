@@ -25,7 +25,7 @@ def upload_file_to_pod(api: client.CoreV1Api, name: str, file: UploadFile, desti
             if not data:
                 break
             commands.append(data)
-        resp.write(b"".join(commands))
+        resp.write_stdin(b"".join(commands))
     resp.write_stdin(None)
     print(resp.read_stdout())
     print(resp.read_stderr())
