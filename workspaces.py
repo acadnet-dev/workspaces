@@ -41,9 +41,7 @@ class Workspace:
         for i in range(60):
             pod_status = v1.read_namespaced_pod_status(pod_name, "acadnet")
             if pod_status.status.phase == "Running":
-                pod = v1.read_namespaced_pod_log(pod_name, "acadnet")
-                if "Uvicorn running" in pod:
-                    break
+                break
             time.sleep(5)
 
         if "Uvicorn running" not in pod:
