@@ -20,6 +20,9 @@ def upload_textfile_to_pod(api: client.CoreV1Api, name: str, file: UploadFile, d
                   stdin=True, stdout=True, stderr=True, tty=False,
                   _preload_content=False)
 
+    print(resp.read_stdout())
+    print(resp.read_stderr())
+
     resp.close()
 
     # remove tar file
