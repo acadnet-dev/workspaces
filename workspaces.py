@@ -7,6 +7,7 @@ from os import path
 import yaml
 
 from config import Config
+from utils import upload_file_to_pod
 
 from kubernetes import client, config
 
@@ -66,6 +67,12 @@ class Workspace:
         except Exception as e:
             return None
 
+    def add_file(self, file: UploadFile):
+        config.load_incluster_config()
+        v1 = client.CoreV1Api()
+
+        upload_file_to_pod(v1, self.pod_name, file, "/home/workspace/" + file.filename)    
+    
 # gets endpoint for workspace
 @app.post("/workspace/get/")
 async def create_workspace(id: str, files: list[UploadFile]):
@@ -78,7 +85,12 @@ async def create_workspace(id: str, files: list[UploadFile]):
 
         # if pod does not exist, create it
         if endpoint == None:
+            # create pod
             workspace.create_pod()
+            # add files to pod
+            for file in files:
+                workspace.add_file(file)
+            # get pod endpoint
             endpoint = workspace.get_pod_endpoint()
 
         return {"endpoint": endpoint}
