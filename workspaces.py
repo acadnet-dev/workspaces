@@ -98,7 +98,7 @@ async def create_workspace(id: str, problem_name: str, files: list[UploadFile]):
         return {"error": str(e)}
 
 # returns the endpoint for workspace if it exists
-@app.post("/workspace/get/")
+@app.get("/workspace/get/")
 async def get_workspace(id: str):
     try:
         # create new workspace
