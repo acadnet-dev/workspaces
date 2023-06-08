@@ -26,7 +26,7 @@ class Workspace:
         config.load_incluster_config()
         v1 = client.CoreV1Api()
 
-        with open(path.join(path.dirname(__file__), "sandbox-cpp-deployment.yaml")) as f:
+        with open(path.join(path.dirname(__file__), "vscode-server-deployment.yaml")) as f:
             pod = yaml.safe_load(f)
 
             pod_name = pod["metadata"]["name"] + "-" + self.id
