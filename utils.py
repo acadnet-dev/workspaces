@@ -2,43 +2,24 @@ from kubernetes import client, config
 from kubernetes.stream import stream
 from fastapi import UploadFile
 from os import path
+import base64
 
-def upload_file_to_pod(api: client.CoreV1Api, name: str, file: UploadFile, destination: str):
-    # get file name
-    file_name = path.basename(file.filename)
 
-    # create tar file
-    tar_file = f"/tmp/{file_name}.tar"
-    with open(tar_file, "wb") as f:
-        f.write(file.file.read())
+def upload_textfile_to_pod(api: client.CoreV1Api, name: str, file: UploadFile, destination_folder: str):
+    # encode as b64
+    file_content = file.file.read()
+    file_content = base64.b64encode(file_content)
+
+    commands = []
+    # echo b64 | base64 -d > file
+    commands.append(f"echo {file_content} | base64 -d > {destination_folder}/{file.filename}")
 
     # upload tar file to pod
     resp = stream(api.connect_get_namespaced_pod_exec, name, "acadnet",
-                  command=["tar", "xvf", "-", "-C", destination],
+                  command=commands,
                   stdin=True, stdout=True, stderr=True, tty=False,
                   _preload_content=False)
 
-    commands = []
-    with open(tar_file, "rb") as f:
-        while True:
-            data = f.read(1024)
-            if not data:
-                break
-            commands.append(data)
-
-    
-    while resp.is_open():
-        resp.update(timeout=1)
-        if resp.peek_stdout():
-            print("STDOUT: %s" % resp.read_stdout())
-        if resp.peek_stderr():
-            print("STDERR: %s" % resp.read_stderr())
-        if commands:
-            c = commands.pop(0)
-            #print("Running command... %s\n" % c)
-            resp.write_stdin(c)
-        else:
-            break
     resp.close()
 
     # remove tar file

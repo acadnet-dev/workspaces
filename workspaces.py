@@ -71,7 +71,7 @@ class Workspace:
         config.load_incluster_config()
         v1 = client.CoreV1Api()
 
-        upload_file_to_pod(v1, self.pod_name, file, "/home/workspace/" + file.filename)    
+        upload_file_to_pod(v1, self.pod_name, file, "/home/workspace")    
     
 # gets endpoint for workspace
 @app.post("/workspace/get/")
