@@ -38,13 +38,15 @@ class Workspace:
 
         # wait for sandbox to start maxim 5 minutes (pod creation takes a while, even more if scaling up)
         # 5 minutes = 60 * 5 = 300 seconds (poll every 5 seconds 60 times)
+        ok = False
         for i in range(60):
             pod_status = v1.read_namespaced_pod_status(pod_name, "acadnet")
             if pod_status.status.phase == "Running":
+                ok = True
                 break
             time.sleep(5)
 
-        if "Uvicorn running" not in pod:
+        if not ok:
             raise Exception("Sandbox failed to start")
         
         self.pod_name = pod_name
