@@ -7,7 +7,7 @@ from os import path
 import yaml
 
 from config import Config
-from utils import upload_file_to_pod
+from utils import upload_textfile_to_pod
 
 from kubernetes import client, config
 
@@ -71,7 +71,7 @@ class Workspace:
         config.load_incluster_config()
         v1 = client.CoreV1Api()
 
-        upload_file_to_pod(v1, self.pod_name, file, "/home/workspace")    
+        upload_textfile_to_pod(v1, self.pod_name, file, "/home/workspace")    
     
 # gets endpoint for workspace
 @app.post("/workspace/get/")
